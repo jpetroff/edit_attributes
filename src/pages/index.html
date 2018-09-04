@@ -1,0 +1,213 @@
+<div id="attributes-popup">
+	<div class="popup-content" v-bind:class="{embedded: style == 'embed', centered: style == 'popup', 'round': (style == 'embed' && isChanged)}">
+		<!--  -->
+		<div class="header" v-if="style == 'popup'">
+
+		</div>
+	
+		<!--  -->
+		<div class="scrollable-body-wrapper v1" ref="scrollContainer" @scroll="spyScroll">
+			<div class="title">{{username}}</div>
+			<div class="scrollable-body">
+					
+	
+					<div class="list-header">
+						<div class="list-header-item name">custom attributes</div>
+						<div class="list-header-item value">value</div>
+					</div>
+		
+					<div class="custom-attributes-wrapper">
+						<transition-group name="list" tag="div" v-on:enter="scrollTo">
+						<div class="custom-attribute-item"
+							v-for="(item, ind) in cattrs"
+							v-bind:class="{'faded': (selectedAttr != -1 && selectedAttr != ind)}"
+							v-bind:key="item"
+						>
+							<div class="close-wrapper" @click="deleteAttr(0, ind)">
+									<div class="close">
+											<svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+												<g id="ico">
+												<path id="Combined Shape" fill-rule="evenodd" clip-rule="evenodd" d="M14 13.2918L18.8951 8.39667C19.0907 8.20111 19.4078 8.20111 19.6033 8.39667C19.7989 8.59224 19.7989 8.90931 19.6033 9.10488L14.7082 14L19.6033 18.8951C19.7989 19.0907 19.7989 19.4078 19.6033 19.6033C19.4078 19.7989 19.0907 19.7989 18.8951 19.6033L14 14.7082L9.10488 19.6033C8.90931 19.7989 8.59224 19.7989 8.39667 19.6033C8.20111 19.4078 8.20111 19.0907 8.39667 18.8951L13.2918 14L8.39667 9.10488C8.20111 8.90931 8.20111 8.59224 8.39667 8.39667C8.59224 8.20111 8.90931 8.20111 9.10488 8.39667L14 13.2918Z" fill="#787878"/>
+												</g>
+												</svg>
+									</div>
+							</div>
+							<!-- <div class="close-wrapper v2" :class="{permashow: selectedItems.length != 0}" @click="selectAttr(0, ind)">
+								<div class="close" 
+									:class="{selected: selectedItems.indexOf(ind) != -1}"
+								>
+								<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+									<path d="M6.87255 10.1665C6.68837 9.96077 6.37227 9.94328 6.16652 10.1275C5.96077 10.3116 5.94328 10.6277 6.12745 10.8335L6.87255 10.1665ZM13.8809 8.32387C14.0598 8.11348 14.0343 7.79793 13.8239 7.61907C13.6135 7.4402 13.2979 7.46575 13.1191 7.67613L13.8809 8.32387ZM8.8471 13.1221L9.21965 12.7886L8.8471 13.1221ZM6.12745 10.8335L8.47455 13.4556L9.21965 12.7886L6.87255 10.1665L6.12745 10.8335ZM9.52943 13.4421L13.8809 8.32387L13.1191 7.67613L8.76756 12.7944L9.52943 13.4421ZM8.47455 13.4556C8.75757 13.7717 9.25456 13.7654 9.52943 13.4421L8.76756 12.7944C8.88536 12.6558 9.09835 12.6531 9.21965 12.7886L8.47455 13.4556Z" fill="#A6A6A6"/>
+									</svg>
+								</div>
+							</div> -->
+							
+							<div class="name">
+								<div class="badge">
+									<span class="caption">{{item.name}}</span>
+								</div>
+							</div>
+			
+							<div class="value">
+								<div class="input-wrapper" @click="_focusField($event.currentTarget)">
+									<span 
+										class="input-control" 
+										@blur="onAttrBlur"
+										@focus="onAttrFocus(ind)"
+										@keydown="inputKeyDown($event)"
+										@input="logChange"
+										contenteditable="plaintext-only" tabindex="0">{{item.value}}</span>	
+								</div>
+							</div>
+			
+						</div>
+						</transition-group>
+
+						<transition-group name="list" tag="div" v-on:enter="scrollTo">
+						<div class="custom-attribute-item editable-attribute-item" v-for="(item,ind) in newattrs" v-bind:key="item.key">
+							<div class="close-wrapper" @click="deleteAttr(1, ind)">
+									<div class="close" v-bind:data-i="ind">
+											<svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+												<g id="ico">
+												<path id="Combined Shape" fill-rule="evenodd" clip-rule="evenodd" d="M14 13.2918L18.8951 8.39667C19.0907 8.20111 19.4078 8.20111 19.6033 8.39667C19.7989 8.59224 19.7989 8.90931 19.6033 9.10488L14.7082 14L19.6033 18.8951C19.7989 19.0907 19.7989 19.4078 19.6033 19.6033C19.4078 19.7989 19.0907 19.7989 18.8951 19.6033L14 14.7082L9.10488 19.6033C8.90931 19.7989 8.59224 19.7989 8.39667 19.6033C8.20111 19.4078 8.20111 19.0907 8.39667 18.8951L13.2918 14L8.39667 9.10488C8.20111 8.90931 8.20111 8.59224 8.39667 8.39667C8.59224 8.20111 8.90931 8.20111 9.10488 8.39667L14 13.2918Z" fill="#787878"/>
+												</g>
+												</svg>
+									</div>
+							</div>
+							<!-- <div class="close-wrapper v2" :class="{permashow: selectedItems.length != 0}" @click="selectAttr(1, ind+1)">
+								<div class="close" 
+									:class="{selected: selectedItems.indexOf(-(ind+1)) != -1}"
+								>
+								<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+									<path d="M6.87255 10.1665C6.68837 9.96077 6.37227 9.94328 6.16652 10.1275C5.96077 10.3116 5.94328 10.6277 6.12745 10.8335L6.87255 10.1665ZM13.8809 8.32387C14.0598 8.11348 14.0343 7.79793 13.8239 7.61907C13.6135 7.4402 13.2979 7.46575 13.1191 7.67613L13.8809 8.32387ZM8.8471 13.1221L9.21965 12.7886L8.8471 13.1221ZM6.12745 10.8335L8.47455 13.4556L9.21965 12.7886L6.87255 10.1665L6.12745 10.8335ZM9.52943 13.4421L13.8809 8.32387L13.1191 7.67613L8.76756 12.7944L9.52943 13.4421ZM8.47455 13.4556C8.75757 13.7717 9.25456 13.7654 9.52943 13.4421L8.76756 12.7944C8.88536 12.6558 9.09835 12.6531 9.21965 12.7886L8.47455 13.4556Z" fill="#A6A6A6"/>
+									</svg>
+								</div>
+							</div> -->
+							<div class="name">
+									<div class="input-wrapper" @click="_focusField($event.currentTarget)" v-show="!item.saved">
+											<span 
+												class="input-control empty" 
+												@blur="onAttrBlur($event.currentTarget, true, ind)"
+												@focus="onAttrFocus(ind)"
+												@keydown="inputKeyDown($event)"
+												@input="saveName($event.currentTarget, ind)"
+												contenteditable="plaintext-only" tabindex="0"></span>	
+										</div>
+										<div class="badge" v-show="item.saved"><span class="caption">{{item.name}}</span></div>
+							</div>
+
+							<div class="value">
+									<div class="input-wrapper" @click="_focusField($event.currentTarget)">
+											<span 
+												class="input-control empty" 
+												@blur="onAttrBlur"
+												@focus="onAttrFocus(ind)"
+												@keydown="inputKeyDown($event)"
+												@input="saveValue($event.currentTarget, ind)"
+												contenteditable="plaintext-only" tabindex="0"></span>	
+										</div>
+							</div>
+						</div>
+						</transition-group>
+					</div>
+
+					<div class="inline-footer" v-if="style == 'embed'" :class="{hidden: showFooter}" ref="inlineFooter">
+						<div class="btn-wrapper" v-show="this.selectedItems.length == 0">
+								<div class="btn btn-icon" @click="addNewAttrStr">
+										<svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+											<g id="plus">
+											<rect width="28" height="28" fill="black" fill-opacity="0"/>
+											<path id="Combined Shape" fill-rule="evenodd" clip-rule="evenodd" d="M15 7.5C15 7.22388 14.7761 7 14.5 7C14.2239 7 14 7.22388 14 7.5V13H8.5C8.22386 13 8 13.2239 8 13.5C8 13.7761 8.22386 14 8.5 14H14V19.5C14 19.7761 14.2239 20 14.5 20C14.7761 20 15 19.7761 15 19.5V14H20.5C20.7761 14 21 13.7761 21 13.5C21 13.2239 20.7761 13 20.5 13H15V7.5Z" fill="#101010"/>
+											</g>
+											</svg>
+									<span class="btn-captiion">Add</span>
+								</div>
+							</div>
+							<!-- <div class="btn-wrapper" v-show="this.selectedItems.length != 0">
+									<div class="btn btn-danger"
+										@click="deleteSelected"
+									>
+										Delete
+									</div>
+									<div class="btn" @click="selectedItems = []">Clear selection</div>
+							</div> -->
+					</div>
+		
+					<div class="list-header">
+						<div class="list-header-item name">system attributes</div>
+						<div class="list-header-item value">value</div>
+					</div>
+					
+					<div class="system-attributes-wrapper">
+							<div class="system-attribute-item"
+								v-for="item in sattrs"
+							>
+		
+								<div class="name">
+									<div class="badge"><span class="caption">{{item.name}}</span></div>
+								</div>
+		
+								<div class="value">
+									<div class="badge"><span class="caption">{{item.value}}</span></div>
+								</div>
+		
+						</div>
+					</div>
+		
+				</div>
+			</div>
+		
+			<!--  -->
+		<div class="footer" v-show="showFooter || style == 'popup'">
+			<div class="btn-wrapper">
+					<div class="btn btn-icon" @click="addNewAttrStr">
+						<svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+							<g id="plus">
+							<rect width="28" height="28" fill="black" fill-opacity="0"/>
+							<path id="Combined Shape" fill-rule="evenodd" clip-rule="evenodd" d="M15 7.5C15 7.22388 14.7761 7 14.5 7C14.2239 7 14 7.22388 14 7.5V13H8.5C8.22386 13 8 13.2239 8 13.5C8 13.7761 8.22386 14 8.5 14H14V19.5C14 19.7761 14.2239 20 14.5 20C14.7761 20 15 19.7761 15 19.5V14H20.5C20.7761 14 21 13.7761 21 13.5C21 13.2239 20.7761 13 20.5 13H15V7.5Z" fill="#101010"/>
+							</g>
+							</svg>
+						<span class="btn-captiion">Add</span>
+					</div>
+			</div>
+			<div class="btn-wrapper" v-if="style == 'popup'" style="text-align: center;">
+					<div class="btn"
+					>
+						Ok
+					</div>
+			</div>
+		</div>
+	
+		
+	</div>
+	<div class="backdrop" v-show="style == 'popup'"></div>
+</div>
+
+<div class="livechat-mockup">
+	<div class="mhead"></div>
+	<div class="mcolumns">
+		<div class="mleft">&nbsp;</div>
+		<div class="mcenter"></div>
+		<div class="mright"></div>
+	</div>
+</div>
+
+<div class="undo-toast-wrapper" id="global-undo-toast">
+	<transition name="toast-animation">
+	<div class="undo-toast" v-show="isShown" @click="restore" :class="{restoreState: isRestore}">
+		<transition :name="toastAnim">
+		<div class="alert-wrapper" :key="actionKey">
+				<div class="caption">{{entity}}&nbsp;{{action}}&nbsp;{{truncName()}}</div>
+				<div class="shortcut" v-if="!isRestore">⌘ + Z</div>
+				<div class="btn-contrast" v-if="!isRestore">
+						<svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+							<path fill-rule="evenodd" clip-rule="evenodd" d="M11 10H15C17.7614 10 20 12.2385 20 15C20 17.7615 17.7614 20 15 20H11V19H15C17.2091 19 19 17.2092 19 15C19 12.7908 17.2091 11 15 11H11V10Z" fill="black"/>
+							<path d="M14 7V14L9 10.5L14 7Z" fill="black"/>
+						</svg>
+				</div>
+				<div class="btn-close"></div>
+		</div>
+		</transition>
+	</div>
+	</transition>	
+</div>

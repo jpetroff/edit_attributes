@@ -1,0 +1,99 @@
+.undo-toast	{
+	position: fixed;
+	z-index: 99999;
+	bottom: 20px;
+	width: 412px;
+	height: 44px;
+	left: 24px;
+	// margin-left: -206px;
+	background: rgba(0,0,0,0.8);
+	padding: 8px 8px 8px 12px;
+	box-sizing: border-box;
+	border-radius: 4px;
+	min-width: 300px;
+	opacity: 1;
+	// transform: translateX(-50%);
+	box-shadow: 0 8px 64px 0 rgba(20, 20, 20, 0.16);
+	cursor: pointer;
+	transition: width 0.1s ease 0.1s;
+
+	&.restoreState {
+		width: 300px;
+		transition: width 0.1s ease 0.1s, opacity 0.2s ease, bottom 0.2s ease;
+	}
+
+	// &:not(.restoreState) .alert-wrapper {
+	// 	.shortcut {opacity: 1 !important;}
+	// 	.btn-contrast {opacity: 1 !important;}
+	// }
+
+	.alert-wrapper {
+		opacity: 1;
+		overflow: hidden;
+	}
+	
+	.undone-wrapper, .alert-wrapper {
+		display: flex;
+		justify-content: space-between;
+	}
+
+	.btn-contrast {
+		background: white;
+		width: 28px;
+		height: 28px;
+		border-radius: 3px;
+	}
+
+	.caption, .shortcut {
+		color: white;
+		font-size: 15px;
+		line-height: 27px;
+	}
+
+	.caption {
+		flex-grow: 1;
+		// padding-right: 28px;
+	}
+
+	.shortcut { 
+		flex-grow: 0;
+		opacity: 0.4;
+		padding: 0 8px;
+	}
+
+}
+
+.toast-animation-enter {
+	opacity: 0;
+	bottom: -44px; 
+}
+
+.toast-animation-enter-active {
+	transition: opacity 0.2s ease, bottom 0.2s ease;
+	transition-delay: 0.2s;
+}
+
+.toast-animation-leave-active {
+	transition: opacity 0.2s ease, bottom 0.2s ease;
+}
+
+.toast-animation-leave-to {
+	opacity: 0 !important;
+	bottom: 20px !important;
+}
+
+.toast-state-enter {
+	opacity: 0 !important;
+}
+
+.toast-state-leave-to {
+	opacity: 0 !important;
+}
+
+.toast-state-enter-active {
+	transition: opacity 0.1s ease-in 0.1s;
+}
+
+.toast-state-leave-active {
+	transition: opacity 0.1s ease-out;
+}
